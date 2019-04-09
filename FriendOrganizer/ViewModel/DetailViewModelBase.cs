@@ -9,6 +9,8 @@ namespace FriendOrganizer.ViewModel
     public abstract class DetailViewModelBase : ViewModelBase, IDetailViewModel
     {
         private bool _hasChanges;
+        private int _id;
+        private string _title;
         protected readonly IEventAggregator EventAggregator;
 
         public DetailViewModelBase(IEventAggregator eventAggregator)
@@ -31,6 +33,22 @@ namespace FriendOrganizer.ViewModel
                 _hasChanges = value;
                 OnPropertyChanged();
                 ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();
+            }
+        }
+
+        public int Id
+        {
+            get { return _id; }
+            protected set { _id = value; }
+        }
+
+        public string Title
+        {
+            get => _title;
+            set
+            {
+                _title = value;
+                OnPropertyChanged();
             }
         }
 

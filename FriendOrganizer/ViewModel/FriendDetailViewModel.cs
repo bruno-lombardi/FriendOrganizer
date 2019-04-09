@@ -5,6 +5,7 @@ using FriendOrganizer.View.Services;
 using FriendOrganizer.Wrapper;
 using Prism.Commands;
 using Prism.Events;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -71,6 +72,8 @@ namespace FriendOrganizer.ViewModel
                 await _friendRepository.GetByIdAsync(friendId.Value) :
                 CreateNewFriend();
 
+            Id = friend.Id;
+
             InitializeFriend(friend);
             InitializeFriendPhoneNumbers(friend.PhoneNumbers);
             await LoadProgrammingLanguagesLookupAsync();
@@ -117,6 +120,9 @@ namespace FriendOrganizer.ViewModel
                     HasChanges = _friendRepository.HasChanges();
                 if (e.PropertyName == nameof(Friend.HasErrors))
                     ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();
+                if (e.PropertyName == nameof(Friend.FirstName) ||
+                e.PropertyName == nameof(Friend.LastName))
+                    SetTitle();
             };
             ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();
             if (Friend.Id == 0)
@@ -124,6 +130,12 @@ namespace FriendOrganizer.ViewModel
                 // Trigger the validation
                 Friend.FirstName = "";
             }
+            SetTitle();
+        }
+
+        private void SetTitle()
+        {
+            Title = $"{Friend.FirstName} {Friend.LastName}";
         }
 
         private async Task LoadProgrammingLanguagesLookupAsync()
@@ -148,6 +160,7 @@ namespace FriendOrganizer.ViewModel
         {
             await _friendRepository.SaveAsync();
             HasChanges = _friendRepository.HasChanges();
+            Id = Friend.Id;
             RaiseDetailSavedEvent(Friend.Id, $"{Friend.FirstName} {Friend.LastName}");
         }
 
